@@ -65,6 +65,19 @@
             border-radius: 24px;
             padding: 20px;
         }
+        .top-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+        }
+        .small-btn {
+            background: #2a2a2a;
+            padding: 10px 18px;
+            font-size: 14px;
+            border-radius: 30px;
+            border: 1px solid #444;
+            font-weight: bold;
+        }
         .big-btn {
             width: 100%;
             padding: 28px 16px;
@@ -139,52 +152,87 @@
         .reset-btn {
             background: #333;
         }
-        .status {
-            background: #1a4d1a;
-            color: #aaffaa;
-            padding: 14px;
-            text-align: center;
-            border-radius: 14px;
-            margin: 15px 0;
-            font-size: 14px;
-            line-height: 1.4;
-        }
         .flex-buttons {
             display: flex;
             gap: 12px;
             justify-content: center;
             margin: 15px 0;
         }
-        .instruction {
-            color: #888;
-            font-size: 13px;
-            text-align: center;
-            margin: 12px 0;
-            background: #111;
-            padding: 10px;
-            border-radius: 12px;
-        }
-        button {
-            cursor: pointer;
-            border: none;
-        }
-        button:active {
-            transform: scale(0.97);
-        }
-        .toast-msg {
+        .recovery-modal {
             position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1a4d1a;
-            color: #aaffaa;
-            padding: 12px 24px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .recovery-box {
+            background: #121212;
+            padding: 24px;
+            border-radius: 28px;
+            width: 90%;
+            max-width: 340px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+        .recovery-box h3 {
+            color: white;
+            margin: 0 0 10px 0;
+        }
+        .generated-code {
+            background: #1a1a2a;
+            padding: 14px;
+            border-radius: 16px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 24px;
+            letter-spacing: 4px;
+            color: #88aaff;
+            font-weight: bold;
+            cursor: pointer;
+            border: 1px solid #88aaff;
+        }
+        .generated-code:active {
+            background: #2a2a3a;
+        }
+        .recovery-input {
+            width: 100%;
+            background: #2a2a2a;
+            color: white;
+            border: 1px solid #444;
+            border-radius: 16px;
+            padding: 14px;
+            font-size: 20px;
+            text-align: center;
+            letter-spacing: 3px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+        .recovery-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .recovery-buttons button {
+            flex: 1;
+            padding: 12px;
             border-radius: 40px;
-            font-size: 16px;
-            z-index: 1000;
-            white-space: nowrap;
-            box-shadow: 0 4px 12px black;
-            pointer-events: none;
+            font-weight: bold;
+        }
+        .confirm-btn {
+            background: #ff5500;
+        }
+        .cancel-btn {
+            background: #2a2a2a;
+        }
+        .code-label {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 5px;
         }
     </style>
 </head>
@@ -198,6 +246,10 @@
 
     <div id="mainPanel" style="display: none;">
         <div class="main-panel">
+            <div class="top-buttons">
+                <button id="recoveryBtn" class="small-btn">♻️ Recovery</button>
+            </div>
+            
             <button id="randomBtn" class="big-btn">🎲 СЛУЧАЙНЫЙ НИК</button>
             
             <div class="nick-box" id="nickDisplay">—</div>
@@ -214,18 +266,13 @@
                 <button id="doneBtn" class="used-btn">✓ ВЫПОЛНИЛ</button>
                 <button id="resetBtn" class="reset-btn">⟳ СБРОС</button>
             </div>
-            
-            <div id="statusMsg" class="status">⚡ Готов к работе</div>
-            <div class="instruction">
-                📱 Нажми на ник или пароль → скопируется<br>
-                🔁 После лайка нажми ВЫПОЛНИЛ
-            </div>
         </div>
     </div>
 </div>
 
 <script>
-const ALL_NICKS = [
+// ========== НИКИ (70 старых + новые без дубликатов) ==========
+const BASE_NICKS = [
     "17enttt","tanos-624602436","st0kkman","fatmandygng","prod-mandy",
     "flewed-532745435","erdmankry","reallyrich2k26","jellynest-5","totrapmusicbuth",
     "fendy1s","smokingdaver","dorbaby","pamdtuk","yngbom","rocckset","smalepoint",
@@ -240,39 +287,38 @@ const ALL_NICKS = [
     "dudeneatsssssss","whot891","mdmoodl"
 ];
 
-let available = [...ALL_NICKS];
-let used = [];
-let currentNick = null;
+// Новые ники (добавляем только те, которых ещё нет)
+const NEW_NICKS = [
+    "noahsmithhhhhh", "ilykilsss", "user-45490173", "drankkk-drank",
+    "qlondys", "fuksjail", "mattcrytt", "famlimon", "bleed1ng",
+    "sadface-exe-970064866", "blinkc187", "itsok2cryyyyyy"
+];
+
+// Объединяем без дубликатов
+const allUniqueNicks = [...new Set([...BASE_NICKS, ...NEW_NICKS])];
+
+// Создаём массив с трёхзначными номерами (001, 002, 003...)
+const NICKS_WITH_NUMBERS = allUniqueNicks.map((nick, index) => ({
+    num: String(index + 1).padStart(3, '0'),
+    nick: nick
+}));
+
+let availableNicks = [...NICKS_WITH_NUMBERS];
+let usedNicks = [];
+let currentNickObj = null;
 let trackUrl = "";
 let userPassword = "";
 let sessionActive = false;
 let waitingForDone = false;
 
-function showToast(msg, isError = false) {
-    const toast = document.createElement('div');
-    toast.className = 'toast-msg';
-    toast.textContent = msg;
-    toast.style.background = isError ? '#4a1a1a' : '#1a4d1a';
-    toast.style.color = isError ? '#ffaaaa' : '#aaffaa';
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2000);
-}
-
 function updateUI() {
-    document.getElementById('remainCount').innerText = available.length;
-    document.getElementById('usedCount').innerText = used.length;
+    document.getElementById('remainCount').innerText = availableNicks.length;
+    document.getElementById('usedCount').innerText = usedNicks.length;
 }
 
-function setStatus(text, isError = false) {
-    const statusDiv = document.getElementById('statusMsg');
-    statusDiv.innerHTML = text;
-    statusDiv.style.background = isError ? '#4a1a1a' : '#1a4d1a';
-}
-
-async function copyToClipboard(text, successMsg) {
+async function copyToClipboard(text) {
     try {
         await navigator.clipboard.writeText(text);
-        showToast(successMsg);
     } catch(e) {
         const ta = document.createElement('textarea');
         ta.value = text;
@@ -280,38 +326,21 @@ async function copyToClipboard(text, successMsg) {
         ta.select();
         document.execCommand('copy');
         document.body.removeChild(ta);
-        showToast(successMsg);
     }
 }
 
-// ========== 100% РАБОЧИЙ МЕТОД - НЕ ОТКРЫВАЕТСЯ В ПРИЛОЖЕНИИ ==========
 function openInBrowser(url) {
-    // Открываем пустую вкладку
     const newWindow = window.open('about:blank', '_blank');
-    
     if (newWindow) {
-        // Через мета-тег перенаправляем
         newWindow.document.write(`
             <!DOCTYPE html>
             <html>
-            <head>
-                <meta http-equiv="refresh" content="0; url=${url}">
-                <style>
-                    body {
-                        background: #0a0a0a;
-                        color: white;
-                        text-align: center;
-                        padding: 50px;
-                        font-family: system-ui;
-                    }
-                </style>
-            </head>
-            <body>⏳ Перенаправление на SoundCloud...</body>
+            <head><meta http-equiv="refresh" content="0; url=${url}"></head>
+            <body style="background:#0a0a0a;color:white;text-align:center;padding:50px">⏳</body>
             </html>
         `);
         newWindow.document.close();
     } else {
-        // Если блокировщик попапов сработал - fallback
         const a = document.createElement('a');
         a.href = url;
         a.target = '_blank';
@@ -322,82 +351,138 @@ function openInBrowser(url) {
     }
 }
 
-async function onRandomNick() {
-    if (!sessionActive) {
-        setStatus("Сначала нажми СТАРТ", true);
-        return;
+// ========== RECOVERY ==========
+function showRecoveryModal() {
+    const usedNumbers = usedNicks.map(n => n.num).sort();
+    let recoveryCode = "";
+    for (const num of usedNumbers) {
+        recoveryCode += num;
     }
-    if (available.length === 0) {
-        setStatus("Все ники использованы! Нажми СБРОС", true);
-        return;
-    }
-    if (waitingForDone) {
-        setStatus("Сначала нажми ВЫПОЛНИЛ", true);
-        return;
+    if (recoveryCode === "") recoveryCode = "001002003";
+    
+    const modal = document.createElement('div');
+    modal.className = 'recovery-modal';
+    modal.innerHTML = `
+        <div class="recovery-box">
+            <h3>♻️ Recovery</h3>
+            <div class="code-label">📋 Твой код (нажми → копировать)</div>
+            <div class="generated-code" id="generatedCode">${recoveryCode}</div>
+            <div class="code-label">🔓 Или введи чужой код</div>
+            <input type="text" id="recoveryInput" class="recovery-input" placeholder="001002003005" autocomplete="off">
+            <div class="recovery-buttons">
+                <button id="recoveryConfirm" class="confirm-btn">Восстановить</button>
+                <button id="recoveryCancel" class="cancel-btn">Отмена</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    document.getElementById('generatedCode').onclick = () => {
+        const code = document.getElementById('generatedCode').innerText;
+        copyToClipboard(code);
+    };
+    
+    document.getElementById('recoveryConfirm').onclick = () => {
+        const inputCode = document.getElementById('recoveryInput').value.trim();
+        if (inputCode) {
+            processRecoveryCode(inputCode);
+        }
+        modal.remove();
+    };
+    document.getElementById('recoveryCancel').onclick = () => modal.remove();
+}
+
+function processRecoveryCode(code) {
+    const triplets = [];
+    for (let i = 0; i < code.length; i += 3) {
+        const triplet = code.substring(i, i + 3);
+        if (triplet.length === 3 && /^\d+$/.test(triplet)) {
+            triplets.push(triplet);
+        }
     }
     
-    const idx = Math.floor(Math.random() * available.length);
-    currentNick = available[idx];
-    document.getElementById('nickDisplay').innerText = currentNick;
-    await copyToClipboard(currentNick, `✅ Ник скопирован: ${currentNick}`);
-    setStatus(`Ник "${currentNick}" скопирован`);
+    if (triplets.length === 0) return;
+    
+    for (const num of triplets) {
+        const foundIndex = availableNicks.findIndex(item => item.num === num);
+        if (foundIndex !== -1) {
+            const recovered = availableNicks[foundIndex];
+            availableNicks.splice(foundIndex, 1);
+            usedNicks.push(recovered);
+        }
+    }
+    
+    updateUI();
+    
+    if (waitingForDone && currentNickObj && usedNicks.includes(currentNickObj)) {
+        waitingForDone = false;
+        currentNickObj = null;
+        document.getElementById('nickDisplay').innerText = "—";
+    }
+}
+
+// ========== ОСНОВНЫЕ ФУНКЦИИ ==========
+async function onRandomNick() {
+    if (!sessionActive) return;
+    if (availableNicks.length === 0) return;
+    if (waitingForDone) return;
+    
+    const idx = Math.floor(Math.random() * availableNicks.length);
+    currentNickObj = availableNicks[idx];
+    document.getElementById('nickDisplay').innerText = currentNickObj.nick;
+    await copyToClipboard(currentNickObj.nick);
     waitingForDone = true;
 }
 
 async function onPasswordClick() {
-    if (!sessionActive) return setStatus("Сначала нажми СТАРТ", true);
+    if (!sessionActive) return;
     if (userPassword) {
-        await copyToClipboard(userPassword, `🔐 Пароль скопирован`);
-        setStatus("Пароль скопирован");
+        await copyToClipboard(userPassword);
     }
 }
 
 function onOpenTrack() {
-    if (!sessionActive || !trackUrl) return setStatus("Сначала нажми СТАРТ", true);
+    if (!sessionActive || !trackUrl) return;
     openInBrowser(trackUrl);
-    setStatus("🔗 Трек открыт в браузере! Поставь лайк и вернись");
 }
 
 function onDone() {
-    if (!waitingForDone || !currentNick) return setStatus("Сначала нажми СЛУЧАЙНЫЙ НИК", true);
+    if (!waitingForDone || !currentNickObj) return;
     
     openInBrowser("https://soundcloud.com/logout");
     
-    const idx = available.indexOf(currentNick);
+    const idx = availableNicks.findIndex(item => item.num === currentNickObj.num);
     if (idx !== -1) {
-        available.splice(idx, 1);
-        used.push(currentNick);
+        availableNicks.splice(idx, 1);
+        usedNicks.push(currentNickObj);
     }
     
     waitingForDone = false;
     updateUI();
     document.getElementById('nickDisplay').innerText = "—";
-    setStatus(`Готов! ${currentNick} отмечен`);
-    showToast(`✅ ${currentNick} использован`);
-    currentNick = null;
+    currentNickObj = null;
 }
 
 function resetSession() {
     sessionActive = false;
     waitingForDone = false;
-    currentNick = null;
-    available = [...ALL_NICKS];
-    used = [];
+    currentNickObj = null;
+    availableNicks = [...NICKS_WITH_NUMBERS];
+    usedNicks = [];
     trackUrl = "";
     userPassword = "";
     document.getElementById('mainPanel').style.display = "none";
     document.getElementById('setupPanel').style.display = "block";
     document.getElementById('trackUrl').value = "";
     document.getElementById('passwordInput').value = "";
-    setStatus("Сессия сброшена");
 }
 
 function startSession() {
     const url = document.getElementById('trackUrl').value.trim();
     const pwd = document.getElementById('passwordInput').value.trim();
     
-    if (!url || !url.includes('soundcloud.com')) return setStatus("Введи ссылку на трек", true);
-    if (!pwd) return setStatus("Введи пароль", true);
+    if (!url || !url.includes('soundcloud.com')) return;
+    if (!pwd) return;
     
     trackUrl = url;
     userPassword = pwd;
@@ -407,13 +492,12 @@ function startSession() {
     document.getElementById('mainPanel').style.display = "block";
     document.getElementById('passwordDisplay').innerText = "•".repeat(Math.min(pwd.length, 12));
     
-    available = [...ALL_NICKS];
-    used = [];
-    currentNick = null;
+    availableNicks = [...NICKS_WITH_NUMBERS];
+    usedNicks = [];
+    currentNickObj = null;
     waitingForDone = false;
     document.getElementById('nickDisplay').innerText = "—";
     updateUI();
-    setStatus("Сессия начата! Жми СЛУЧАЙНЫЙ НИК");
 }
 
 // Обработчики
@@ -423,6 +507,7 @@ document.getElementById('trackBtn').onclick = onOpenTrack;
 document.getElementById('doneBtn').onclick = onDone;
 document.getElementById('resetBtn').onclick = resetSession;
 document.getElementById('passwordDisplay').onclick = onPasswordClick;
+document.getElementById('recoveryBtn').onclick = showRecoveryModal;
 </script>
 </body>
 </html>
