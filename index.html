@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
@@ -12,7 +12,7 @@
         }
         body {
             background: #0a0a0a;
-            font-family: Arial, sans-serif;
+            font-family: system-ui, -apple-system, Arial, sans-serif;
             padding: 12px;
             margin: 0;
             min-height: 100vh;
@@ -60,9 +60,6 @@
             font-size: 20px;
             padding: 16px;
         }
-        #startBtn:hover {
-            background: #ff7700;
-        }
         .main-panel {
             background: #0f0f0f;
             border-radius: 24px;
@@ -70,8 +67,8 @@
         }
         .big-btn {
             width: 100%;
-            padding: 30px 20px;
-            font-size: 28px;
+            padding: 28px 16px;
+            font-size: 26px;
             background: #ff5500;
             border-radius: 60px;
             margin-bottom: 20px;
@@ -128,10 +125,6 @@
             cursor: pointer;
             font-weight: bold;
             margin: 12px 0;
-        }
-        .track-btn:active {
-            transform: scale(0.98);
-            background: #af7ac5;
         }
         .used-btn, .reset-btn {
             padding: 14px 20px;
@@ -207,13 +200,8 @@
         <div class="main-panel">
             <button id="randomBtn" class="big-btn">🎲 СЛУЧАЙНЫЙ НИК</button>
             
-            <div class="nick-box" id="nickDisplay">
-                —
-            </div>
-            
-            <div class="pass-box" id="passwordDisplay">
-                ••••••••
-            </div>
+            <div class="nick-box" id="nickDisplay">—</div>
+            <div class="pass-box" id="passwordDisplay">••••••••</div>
             
             <button id="trackBtn" class="track-btn">🔗 НА ТРЕК</button>
             
@@ -229,7 +217,7 @@
             
             <div id="statusMsg" class="status">⚡ Готов к работе</div>
             <div class="instruction">
-                📱 Нажми на ник или пароль → скопируется в буфер<br>
+                📱 Нажми на ник или пароль → скопируется<br>
                 🔁 После лайка нажми ВЫПОЛНИЛ
             </div>
         </div>
@@ -237,7 +225,6 @@
 </div>
 
 <script>
-// ========== ВСЕ НИКИ ==========
 const ALL_NICKS = [
     "17enttt","tanos-624602436","st0kkman","fatmandygng","prod-mandy",
     "flewed-532745435","erdmankry","reallyrich2k26","jellynest-5","totrapmusicbuth",
@@ -280,48 +267,39 @@ function setStatus(text, isError = false) {
     const statusDiv = document.getElementById('statusMsg');
     statusDiv.innerHTML = text;
     statusDiv.style.background = isError ? '#4a1a1a' : '#1a4d1a';
-    statusDiv.style.color = isError ? '#ffaaaa' : '#aaffaa';
 }
 
 async function copyToClipboard(text, successMsg) {
     try {
         await navigator.clipboard.writeText(text);
         showToast(successMsg);
-        return true;
     } catch(e) {
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
         document.execCommand('copy');
-        document.body.removeChild(textarea);
+        document.body.removeChild(ta);
         showToast(successMsg);
-        return true;
     }
 }
 
-// Функция для открытия ссылки БЕЗ перекидывания в приложение
+// ========== ГЛАВНОЕ: открываем в браузере, НЕ в приложении ==========
 function openInBrowser(url) {
-    // Добавляем параметр ?force_browser=1 чтобы обмануть приложение
-    // И используем target="_blank" с дополнительными атрибутами
-    const link = document.createElement('a');
-    link.href = url;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    
-    // Для мобилок - дополнительный параметр, чтобы не открывало в приложении
-    if (!url.includes('?')) {
-        link.href = url + '?web=1';
-    } else {
-        link.href = url + '&web=1';
+    // Пробуем через window.open с дополнительными параметрами
+    const win = window.open(url, '_blank', 'noopener,noreferrer');
+    if (!win) {
+        // fallback
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
 }
 
-// Кнопка "СЛУЧАЙНЫЙ НИК"
 async function onRandomNick() {
     if (!sessionActive) {
         setStatus("Сначала нажми СТАРТ", true);
@@ -336,61 +314,45 @@ async function onRandomNick() {
         return;
     }
     
-    const randomIndex = Math.floor(Math.random() * available.length);
-    currentNick = available[randomIndex];
-    
-    const nickDisplay = document.getElementById('nickDisplay');
-    nickDisplay.innerText = currentNick;
-    
-    await copyToClipboard(currentNick, `✅ Ник скопирован: ${currentNick}`);
-    setStatus(`Ник "${currentNick}" скопирован! Вставь в логин`);
+    const idx = Math.floor(Math.random() * available.length);
+    currentNick = available[idx];
+    document.getElementById('nickDisplay').innerText = currentNick;
+    await copyToClipboard(currentNick, `✅ Ник скопирован`);
+    setStatus(`Ник "${currentNick}" скопирован`);
     waitingForDone = true;
 }
 
 async function onPasswordClick() {
-    if (!sessionActive) {
-        setStatus("Сначала нажми СТАРТ", true);
-        return;
-    }
+    if (!sessionActive) return setStatus("Сначала нажми СТАРТ", true);
     if (userPassword) {
         await copyToClipboard(userPassword, `🔐 Пароль скопирован`);
-        setStatus("Пароль скопирован! Вставь в поле пароля");
+        setStatus("Пароль скопирован");
     }
 }
 
-// Кнопка "НА ТРЕК" — открываем без приложения
 function onOpenTrack() {
-    if (!sessionActive || !trackUrl) {
-        setStatus("Сначала нажми СТАРТ", true);
-        return;
-    }
+    if (!sessionActive || !trackUrl) return setStatus("Сначала нажми СТАРТ", true);
     openInBrowser(trackUrl);
-    setStatus("🔗 Трек открыт в браузере! Поставь лайк и вернись");
+    setStatus("🔗 Трек открыт в браузере! Поставь лайк");
 }
 
-// Кнопка "ВЫПОЛНИЛ" — логаут тоже без приложения
 function onDone() {
-    if (!waitingForDone || !currentNick) {
-        setStatus("Сначала нажми СЛУЧАЙНЫЙ НИК", true);
-        return;
-    }
+    if (!waitingForDone || !currentNick) return setStatus("Сначала нажми СЛУЧАЙНЫЙ НИК", true);
     
-    // Открываем логаут в браузере
     openInBrowser("https://soundcloud.com/logout");
     
-    const index = available.indexOf(currentNick);
-    if (index !== -1) {
-        available.splice(index, 1);
+    const idx = available.indexOf(currentNick);
+    if (idx !== -1) {
+        available.splice(idx, 1);
         used.push(currentNick);
     }
     
     waitingForDone = false;
     updateUI();
     document.getElementById('nickDisplay').innerText = "—";
-    setStatus(`Готов! ${currentNick} отмечен. Бери следующий ник`);
-    const usedNick = currentNick;
+    setStatus(`Готов! ${currentNick} отмечен`);
+    showToast(`✅ ${currentNick} использован`);
     currentNick = null;
-    showToast(`✅ ${usedNick} использован`, false);
 }
 
 function resetSession() {
@@ -401,36 +363,27 @@ function resetSession() {
     used = [];
     trackUrl = "";
     userPassword = "";
-    
     document.getElementById('mainPanel').style.display = "none";
     document.getElementById('setupPanel').style.display = "block";
     document.getElementById('trackUrl').value = "";
     document.getElementById('passwordInput').value = "";
-    
-    setStatus("Сессия сброшена. Введи ссылку и пароль");
+    setStatus("Сессия сброшена");
 }
 
 function startSession() {
     const url = document.getElementById('trackUrl').value.trim();
-    const password = document.getElementById('passwordInput').value.trim();
+    const pwd = document.getElementById('passwordInput').value.trim();
     
-    if (!url || !url.includes('soundcloud.com')) {
-        setStatus("Введи ссылку на трек SoundCloud", true);
-        return;
-    }
-    if (!password) {
-        setStatus("Введи пароль от аккаунтов", true);
-        return;
-    }
+    if (!url || !url.includes('soundcloud.com')) return setStatus("Введи ссылку на трек", true);
+    if (!pwd) return setStatus("Введи пароль", true);
     
     trackUrl = url;
-    userPassword = password;
+    userPassword = pwd;
     sessionActive = true;
     
     document.getElementById('setupPanel').style.display = "none";
     document.getElementById('mainPanel').style.display = "block";
-    
-    document.getElementById('passwordDisplay').innerText = "•".repeat(Math.min(password.length, 12));
+    document.getElementById('passwordDisplay').innerText = "•".repeat(Math.min(pwd.length, 12));
     
     available = [...ALL_NICKS];
     used = [];
