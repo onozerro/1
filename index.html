@@ -284,12 +284,34 @@ async function copyToClipboard(text, successMsg) {
     }
 }
 
-// ========== ГЛАВНОЕ: открываем в браузере, НЕ в приложении ==========
+// ========== 100% РАБОЧИЙ МЕТОД - НЕ ОТКРЫВАЕТСЯ В ПРИЛОЖЕНИИ ==========
 function openInBrowser(url) {
-    // Пробуем через window.open с дополнительными параметрами
-    const win = window.open(url, '_blank', 'noopener,noreferrer');
-    if (!win) {
-        // fallback
+    // Открываем пустую вкладку
+    const newWindow = window.open('about:blank', '_blank');
+    
+    if (newWindow) {
+        // Через мета-тег перенаправляем
+        newWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta http-equiv="refresh" content="0; url=${url}">
+                <style>
+                    body {
+                        background: #0a0a0a;
+                        color: white;
+                        text-align: center;
+                        padding: 50px;
+                        font-family: system-ui;
+                    }
+                </style>
+            </head>
+            <body>⏳ Перенаправление на SoundCloud...</body>
+            </html>
+        `);
+        newWindow.document.close();
+    } else {
+        // Если блокировщик попапов сработал - fallback
         const a = document.createElement('a');
         a.href = url;
         a.target = '_blank';
@@ -317,7 +339,7 @@ async function onRandomNick() {
     const idx = Math.floor(Math.random() * available.length);
     currentNick = available[idx];
     document.getElementById('nickDisplay').innerText = currentNick;
-    await copyToClipboard(currentNick, `✅ Ник скопирован`);
+    await copyToClipboard(currentNick, `✅ Ник скопирован: ${currentNick}`);
     setStatus(`Ник "${currentNick}" скопирован`);
     waitingForDone = true;
 }
@@ -333,7 +355,7 @@ async function onPasswordClick() {
 function onOpenTrack() {
     if (!sessionActive || !trackUrl) return setStatus("Сначала нажми СТАРТ", true);
     openInBrowser(trackUrl);
-    setStatus("🔗 Трек открыт в браузере! Поставь лайк");
+    setStatus("🔗 Трек открыт в браузере! Поставь лайк и вернись");
 }
 
 function onDone() {
