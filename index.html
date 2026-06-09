@@ -283,14 +283,12 @@ function setStatus(text, isError = false) {
     statusDiv.style.color = isError ? '#ffaaaa' : '#aaffaa';
 }
 
-// Копирование в буфер (для мобилок)
 async function copyToClipboard(text, successMsg) {
     try {
         await navigator.clipboard.writeText(text);
         showToast(successMsg);
         return true;
     } catch(e) {
-        // fallback для старых мобилок
         const textarea = document.createElement('textarea');
         textarea.value = text;
         document.body.appendChild(textarea);
@@ -300,6 +298,27 @@ async function copyToClipboard(text, successMsg) {
         showToast(successMsg);
         return true;
     }
+}
+
+// Функция для открытия ссылки БЕЗ перекидывания в приложение
+function openInBrowser(url) {
+    // Добавляем параметр ?force_browser=1 чтобы обмануть приложение
+    // И используем target="_blank" с дополнительными атрибутами
+    const link = document.createElement('a');
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    
+    // Для мобилок - дополнительный параметр, чтобы не открывало в приложении
+    if (!url.includes('?')) {
+        link.href = url + '?web=1';
+    } else {
+        link.href = url + '&web=1';
+    }
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 // Кнопка "СЛУЧАЙНЫЙ НИК"
@@ -328,7 +347,6 @@ async function onRandomNick() {
     waitingForDone = true;
 }
 
-// Кнопка "ПАРОЛЬ" (клик на поле)
 async function onPasswordClick() {
     if (!sessionActive) {
         setStatus("Сначала нажми СТАРТ", true);
@@ -340,24 +358,25 @@ async function onPasswordClick() {
     }
 }
 
-// Кнопка "НА ТРЕК"
+// Кнопка "НА ТРЕК" — открываем без приложения
 function onOpenTrack() {
     if (!sessionActive || !trackUrl) {
         setStatus("Сначала нажми СТАРТ", true);
         return;
     }
-    window.open(trackUrl, "_blank");
-    setStatus("🔗 Трек открыт! Поставь лайк и вернись");
+    openInBrowser(trackUrl);
+    setStatus("🔗 Трек открыт в браузере! Поставь лайк и вернись");
 }
 
-// Кнопка "ВЫПОЛНИЛ"
+// Кнопка "ВЫПОЛНИЛ" — логаут тоже без приложения
 function onDone() {
     if (!waitingForDone || !currentNick) {
         setStatus("Сначала нажми СЛУЧАЙНЫЙ НИК", true);
         return;
     }
     
-    window.open("https://soundcloud.com/logout", "_blank");
+    // Открываем логаут в браузере
+    openInBrowser("https://soundcloud.com/logout");
     
     const index = available.indexOf(currentNick);
     if (index !== -1) {
@@ -369,11 +388,11 @@ function onDone() {
     updateUI();
     document.getElementById('nickDisplay').innerText = "—";
     setStatus(`Готов! ${currentNick} отмечен. Бери следующий ник`);
+    const usedNick = currentNick;
     currentNick = null;
-    showToast(`✅ ${currentNick} использован`, false);
+    showToast(`✅ ${usedNick} использован`, false);
 }
 
-// СБРОС
 function resetSession() {
     sessionActive = false;
     waitingForDone = false;
@@ -391,7 +410,6 @@ function resetSession() {
     setStatus("Сессия сброшена. Введи ссылку и пароль");
 }
 
-// СТАРТ
 function startSession() {
     const url = document.getElementById('trackUrl').value.trim();
     const password = document.getElementById('passwordInput').value.trim();
@@ -423,7 +441,7 @@ function startSession() {
     setStatus("Сессия начата! Жми СЛУЧАЙНЫЙ НИК");
 }
 
-// Обработчики (для мобилок - touch)
+// Обработчики
 document.getElementById('startBtn').onclick = startSession;
 document.getElementById('randomBtn').onclick = onRandomNick;
 document.getElementById('trackBtn').onclick = onOpenTrack;
