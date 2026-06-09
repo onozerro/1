@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SoundCloud лайкер</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            background: #0a0a0a;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .track-area {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        input, button {
+            font-size: 16px;
+            padding: 10px 15px;
+        }
+        #trackUrl {
+            width: 100%;
+            background: #2a2a2a;
+            color: white;
+            border: 1px solid #444;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        #passwordInput {
+            width: 100%;
+            background: #2a2a2a;
+            color: white;
+            border: 1px solid #444;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        #startBtn {
+            width: 100%;
+            background: #ff5500;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #startBtn:hover {
+            background: #ff7700;
+        }
+        .main-panel {
+            background: #0f0f0f;
+            border-radius: 16px;
+            padding: 20px;
+        }
+        .big-btn {
+            width: 100%;
+            padding: 40px;
+            font-size: 32px;
+            background: #ff5500;
+            border-radius: 60px;
+            margin-bottom: 20px;
+        }
+        .info-bar {
+            background: #1a1a1a;
+            padding: 12px;
+            border-radius: 12px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            color: white;
+            font-size: 18px;
+        }
+        .nick-box, .pass-box {
+            background: #222;
+            padding: 20px;
+            text-align: center;
+            font-size: 28px;
+            font-family: monospace;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-weight: bold;
+            letter-spacing: 1px;
+            cursor: pointer;
+            user-select: all;
+        }
+        .nick-box {
+            color: #ffaa44;
+        }
+        .pass-box {
+            color: #88aaff;
+            font-size: 24px;
+        }
+        .nick-box:active, .pass-box:active {
+            background: #2a2a2a;
+        }
+        .track-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            background: #9b59b6;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .track-btn:hover {
+            background: #af7ac5;
+        }
+        .used-btn, .reset-btn {
+            padding: 12px 24px;
+            font-size: 18px;
+            margin: 5px;
+        }
+        .used-btn {
+            background: #cc0000;
+        }
+        .reset-btn {
+            background: #333;
+        }
+        .status {
+            background: #1a4d1a;
+            color: #aaffaa;
+            padding: 12px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        .flex-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .instruction {
+            color: #888;
+            font-size: 12px;
+            text-align: center;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="setupPanel" class="track-area">
+        <input type="text" id="trackUrl" placeholder="https://soundcloud.com/.../трек">
+        <input type="password" id="passwordInput" placeholder="Пароль от аккаунтов">
+        <button id="startBtn">▶ СТАРТ</button>
+    </div>
+
+    <div id="mainPanel" style="display: none;">
+        <div class="main-panel">
+            <button id="randomBtn" class="big-btn">🎲 СЛУЧАЙНЫЙ НИК</button>
+            
+            <div class="nick-box" id="nickDisplay">
+                —
+            </div>
+            
+            <div class="pass-box" id="passwordDisplay" onclick="selectPassword()">
+                ••••••••
+            </div>
+            
+            <button id="trackBtn" class="track-btn">🔗 НА ТРЕК</button>
+            
+            <div class="info-bar">
+                <span>📦 Осталось: <strong id="remainCount">0</strong></span>
+                <span>✅ Использовано: <strong id="usedCount">0</strong></span>
+            </div>
+            
+            <div class="flex-buttons">
+                <button id="doneBtn" class="used-btn">✓ ВЫПОЛНИЛ</button>
+                <button id="resetBtn" class="reset-btn">⟳ СБРОС</button>
+            </div>
+            
+            <div id="statusMsg" class="status">⚡ Готов к работе</div>
+            <div class="instruction">💡 Нажми на ник или пароль — текст выделится для копирования</div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========== ВСЕ НИКИ ==========
+const ALL_NICKS = [
+    "17enttt","tanos-624602436","st0kkman","fatmandygng","prod-mandy",
+    "flewed-532745435","erdmankry","reallyrich2k26","jellynest-5","totrapmusicbuth",
+    "fendy1s","smokingdaver","dorbaby","pamdtuk","yngbom","rocckset","smalepoint",
+    "prso-unablor","jitqwipper","ven2kk","damfold","crowded3","proddebut","wildkant",
+    "vorqqkk","barb-514332249","30mop","2realslime","b0ximgg","filgenius",
+    "fantoss-483481720","slabboyst","troddennn","laseddev","willswowtfk","satmorphine",
+    "drewnnnnn","fakedunkk","oxxshnta","gelandoke","2amboy","anofenkk","paurinup",
+    "lendray88","supdaily","banddetro72","damncoldy","buddygrol9","strikeqq","flayzed",
+    "jugg2mandy","thekr9ueger","sameder-samderrs","jaystkraylaa","c2razyy","miketlorisss",
+    "kastlook9277","drango-426649390","hamzadoll","ski-dl","tomymontanaaaaaa","wtfdinny71",
+    "bj3agly","2mandys3","toorealslimking","whyyalwaysmeee","2sad2care-205405600",
+    "dudeneatsssssss","whot891","mdmoodl"
+];
+
+let available = [...ALL_NICKS];
+let used = [];
+let currentNick = null;
+let trackUrl = "";
+let userPassword = "";
+let sessionActive = false;
+let waitingForDone = false;
+
+function updateUI() {
+    document.getElementById('remainCount').innerText = available.length;
+    document.getElementById('usedCount').innerText = used.length;
+}
+
+function setStatus(text, isError = false) {
+    const statusDiv = document.getElementById('statusMsg');
+    statusDiv.innerHTML = text;
+    statusDiv.style.background = isError ? '#4a1a1a' : '#1a4d1a';
+    statusDiv.style.color = isError ? '#ffaaaa' : '#aaffaa';
+}
+
+function selectPassword() {
+    const passDisplay = document.getElementById('passwordDisplay');
+    const range = document.createRange();
+    range.selectNodeContents(passDisplay);
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+    setStatus("✅ Пароль выделен! Нажми Ctrl+C");
+}
+
+function selectNick() {
+    const nickDisplay = document.getElementById('nickDisplay');
+    if (nickDisplay.innerText !== "—") {
+        const range = document.createRange();
+        range.selectNodeContents(nickDisplay);
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        setStatus(`✅ Ник "${currentNick}" выделен! Нажми Ctrl+C`);
+    }
+}
+
+// КНОПКА "СЛУЧАЙНЫЙ НИК"
+function onRandomNick() {
+    if (!sessionActive) {
+        setStatus("Сначала нажми СТАРТ", true);
+        return;
+    }
+    if (available.length === 0) {
+        setStatus("Все ники использованы! Нажми СБРОС", true);
+        return;
+    }
+    if (waitingForDone) {
+        setStatus("Сначала нажми ВЫПОЛНИЛ для текущего ника", true);
+        return;
+    }
+    
+    const randomIndex = Math.floor(Math.random() * available.length);
+    currentNick = available[randomIndex];
+    
+    const nickDisplay = document.getElementById('nickDisplay');
+    nickDisplay.innerText = currentNick;
+    
+    selectNick();
+    waitingForDone = true;
+}
+
+// КНОПКА "НА ТРЕК"
+function onOpenTrack() {
+    if (!sessionActive || !trackUrl) {
+        setStatus("Сначала нажми СТАРТ", true);
+        return;
+    }
+    window.open(trackUrl, "_blank");
+    setStatus("🔗 Трек открыт! Поставь лайк");
+}
+
+// КНОПКА "ВЫПОЛНИЛ"
+function onDone() {
+    if (!waitingForDone || !currentNick) {
+        setStatus("Сначала нажми СЛУЧАЙНЫЙ НИК", true);
+        return;
+    }
+    
+    window.open("https://soundcloud.com/logout", "_blank");
+    
+    const index = available.indexOf(currentNick);
+    if (index !== -1) {
+        available.splice(index, 1);
+        used.push(currentNick);
+    }
+    
+    waitingForDone = false;
+    updateUI();
+    document.getElementById('nickDisplay').innerText = "—";
+    setStatus(`Готов! ${currentNick} отмечен. Бери следующий ник`);
+    currentNick = null;
+}
+
+// СБРОС
+function resetSession() {
+    sessionActive = false;
+    waitingForDone = false;
+    currentNick = null;
+    available = [...ALL_NICKS];
+    used = [];
+    trackUrl = "";
+    userPassword = "";
+    
+    document.getElementById('mainPanel').style.display = "none";
+    document.getElementById('setupPanel').style.display = "block";
+    document.getElementById('trackUrl').value = "";
+    document.getElementById('passwordInput').value = "";
+    
+    setStatus("Сессия сброшена. Введи ссылку и пароль заново");
+}
+
+// СТАРТ
+function startSession() {
+    const url = document.getElementById('trackUrl').value.trim();
+    const password = document.getElementById('passwordInput').value.trim();
+    
+    if (!url || !url.includes('soundcloud.com')) {
+        setStatus("Введи ссылку на трек SoundCloud", true);
+        return;
+    }
+    if (!password) {
+        setStatus("Введи пароль от аккаунтов", true);
+        return;
+    }
+    
+    trackUrl = url;
+    userPassword = password;
+    sessionActive = true;
+    
+    document.getElementById('setupPanel').style.display = "none";
+    document.getElementById('mainPanel').style.display = "block";
+    
+    document.getElementById('passwordDisplay').innerText = "•".repeat(password.length);
+    
+    available = [...ALL_NICKS];
+    used = [];
+    currentNick = null;
+    waitingForDone = false;
+    document.getElementById('nickDisplay').innerText = "—";
+    updateUI();
+    setStatus("Сессия начата! Жми СЛУЧАЙНЫЙ НИК");
+}
+
+// Обработчики
+document.getElementById('startBtn').onclick = startSession;
+document.getElementById('randomBtn').onclick = onRandomNick;
+document.getElementById('trackBtn').onclick = onOpenTrack;
+document.getElementById('doneBtn').onclick = onDone;
+document.getElementById('resetBtn').onclick = resetSession;
+document.getElementById('nickDisplay').onclick = selectNick;
+</script>
+</body>
+</html>
