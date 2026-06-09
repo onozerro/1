@@ -2,17 +2,20 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>SoundCloud лайкер</title>
     <style>
         * {
             box-sizing: border-box;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
         body {
             background: #0a0a0a;
             font-family: Arial, sans-serif;
-            padding: 20px;
+            padding: 12px;
             margin: 0;
+            min-height: 100vh;
         }
         .container {
             max-width: 600px;
@@ -20,107 +23,122 @@
         }
         .track-area {
             background: #1a1a1a;
-            padding: 15px;
-            border-radius: 12px;
+            padding: 20px;
+            border-radius: 20px;
             margin-bottom: 20px;
         }
         input, button {
-            font-size: 16px;
-            padding: 10px 15px;
+            font-size: 18px;
+            padding: 14px 18px;
         }
         #trackUrl {
             width: 100%;
             background: #2a2a2a;
             color: white;
             border: 1px solid #444;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            font-size: 16px;
         }
         #passwordInput {
             width: 100%;
             background: #2a2a2a;
             color: white;
             border: 1px solid #444;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            font-size: 16px;
         }
         #startBtn {
             width: 100%;
             background: #ff5500;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 14px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 20px;
+            padding: 16px;
         }
         #startBtn:hover {
             background: #ff7700;
         }
         .main-panel {
             background: #0f0f0f;
-            border-radius: 16px;
+            border-radius: 24px;
             padding: 20px;
         }
         .big-btn {
             width: 100%;
-            padding: 40px;
-            font-size: 32px;
+            padding: 30px 20px;
+            font-size: 28px;
             background: #ff5500;
             border-radius: 60px;
             margin-bottom: 20px;
+            font-weight: bold;
         }
         .info-bar {
             background: #1a1a1a;
-            padding: 12px;
-            border-radius: 12px;
+            padding: 14px;
+            border-radius: 16px;
             margin: 15px 0;
             display: flex;
             justify-content: space-between;
             color: white;
             font-size: 18px;
+            font-weight: bold;
         }
         .nick-box, .pass-box {
             background: #222;
-            padding: 20px;
+            padding: 18px 12px;
             text-align: center;
-            font-size: 28px;
+            font-size: 24px;
             font-family: monospace;
-            border-radius: 12px;
-            margin: 15px 0;
+            border-radius: 16px;
+            margin: 12px 0;
             font-weight: bold;
             letter-spacing: 1px;
             cursor: pointer;
-            user-select: all;
+            transition: 0.1s;
+            word-break: break-all;
         }
         .nick-box {
             color: #ffaa44;
+            background: #2a1a0a;
+            border: 1px solid #ffaa44;
         }
         .pass-box {
             color: #88aaff;
-            font-size: 24px;
+            background: #0a1a2a;
+            border: 1px solid #88aaff;
+            font-size: 22px;
         }
         .nick-box:active, .pass-box:active {
-            background: #2a2a2a;
+            transform: scale(0.98);
+            background: #333;
         }
         .track-btn {
             width: 100%;
-            padding: 15px;
-            font-size: 18px;
+            padding: 16px;
+            font-size: 20px;
             background: #9b59b6;
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 16px;
             cursor: pointer;
             font-weight: bold;
-            margin: 10px 0;
+            margin: 12px 0;
         }
-        .track-btn:hover {
+        .track-btn:active {
+            transform: scale(0.98);
             background: #af7ac5;
         }
         .used-btn, .reset-btn {
-            padding: 12px 24px;
+            padding: 14px 20px;
             font-size: 18px;
             margin: 5px;
+            border-radius: 40px;
+            flex: 1;
         }
         .used-btn {
             background: #cc0000;
@@ -131,22 +149,49 @@
         .status {
             background: #1a4d1a;
             color: #aaffaa;
-            padding: 12px;
+            padding: 14px;
             text-align: center;
-            border-radius: 8px;
+            border-radius: 14px;
             margin: 15px 0;
             font-size: 14px;
+            line-height: 1.4;
         }
         .flex-buttons {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             justify-content: center;
+            margin: 15px 0;
         }
         .instruction {
             color: #888;
-            font-size: 12px;
+            font-size: 13px;
             text-align: center;
-            margin: 10px;
+            margin: 12px 0;
+            background: #111;
+            padding: 10px;
+            border-radius: 12px;
+        }
+        button {
+            cursor: pointer;
+            border: none;
+        }
+        button:active {
+            transform: scale(0.97);
+        }
+        .toast-msg {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a4d1a;
+            color: #aaffaa;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 16px;
+            z-index: 1000;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px black;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -166,7 +211,7 @@
                 —
             </div>
             
-            <div class="pass-box" id="passwordDisplay" onclick="selectPassword()">
+            <div class="pass-box" id="passwordDisplay">
                 ••••••••
             </div>
             
@@ -183,7 +228,10 @@
             </div>
             
             <div id="statusMsg" class="status">⚡ Готов к работе</div>
-            <div class="instruction">💡 Нажми на ник или пароль — текст выделится для копирования</div>
+            <div class="instruction">
+                📱 Нажми на ник или пароль → скопируется в буфер<br>
+                🔁 После лайка нажми ВЫПОЛНИЛ
+            </div>
         </div>
     </div>
 </div>
@@ -213,6 +261,16 @@ let userPassword = "";
 let sessionActive = false;
 let waitingForDone = false;
 
+function showToast(msg, isError = false) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-msg';
+    toast.textContent = msg;
+    toast.style.background = isError ? '#4a1a1a' : '#1a4d1a';
+    toast.style.color = isError ? '#ffaaaa' : '#aaffaa';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+}
+
 function updateUI() {
     document.getElementById('remainCount').innerText = available.length;
     document.getElementById('usedCount').innerText = used.length;
@@ -225,30 +283,27 @@ function setStatus(text, isError = false) {
     statusDiv.style.color = isError ? '#ffaaaa' : '#aaffaa';
 }
 
-function selectPassword() {
-    const passDisplay = document.getElementById('passwordDisplay');
-    const range = document.createRange();
-    range.selectNodeContents(passDisplay);
-    const selection = window.getSelection();
-    selection?.removeAllRanges();
-    selection?.addRange(range);
-    setStatus("✅ Пароль выделен! Нажми Ctrl+C");
-}
-
-function selectNick() {
-    const nickDisplay = document.getElementById('nickDisplay');
-    if (nickDisplay.innerText !== "—") {
-        const range = document.createRange();
-        range.selectNodeContents(nickDisplay);
-        const selection = window.getSelection();
-        selection?.removeAllRanges();
-        selection?.addRange(range);
-        setStatus(`✅ Ник "${currentNick}" выделен! Нажми Ctrl+C`);
+// Копирование в буфер (для мобилок)
+async function copyToClipboard(text, successMsg) {
+    try {
+        await navigator.clipboard.writeText(text);
+        showToast(successMsg);
+        return true;
+    } catch(e) {
+        // fallback для старых мобилок
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast(successMsg);
+        return true;
     }
 }
 
-// КНОПКА "СЛУЧАЙНЫЙ НИК"
-function onRandomNick() {
+// Кнопка "СЛУЧАЙНЫЙ НИК"
+async function onRandomNick() {
     if (!sessionActive) {
         setStatus("Сначала нажми СТАРТ", true);
         return;
@@ -258,7 +313,7 @@ function onRandomNick() {
         return;
     }
     if (waitingForDone) {
-        setStatus("Сначала нажми ВЫПОЛНИЛ для текущего ника", true);
+        setStatus("Сначала нажми ВЫПОЛНИЛ", true);
         return;
     }
     
@@ -268,21 +323,34 @@ function onRandomNick() {
     const nickDisplay = document.getElementById('nickDisplay');
     nickDisplay.innerText = currentNick;
     
-    selectNick();
+    await copyToClipboard(currentNick, `✅ Ник скопирован: ${currentNick}`);
+    setStatus(`Ник "${currentNick}" скопирован! Вставь в логин`);
     waitingForDone = true;
 }
 
-// КНОПКА "НА ТРЕК"
+// Кнопка "ПАРОЛЬ" (клик на поле)
+async function onPasswordClick() {
+    if (!sessionActive) {
+        setStatus("Сначала нажми СТАРТ", true);
+        return;
+    }
+    if (userPassword) {
+        await copyToClipboard(userPassword, `🔐 Пароль скопирован`);
+        setStatus("Пароль скопирован! Вставь в поле пароля");
+    }
+}
+
+// Кнопка "НА ТРЕК"
 function onOpenTrack() {
     if (!sessionActive || !trackUrl) {
         setStatus("Сначала нажми СТАРТ", true);
         return;
     }
     window.open(trackUrl, "_blank");
-    setStatus("🔗 Трек открыт! Поставь лайк");
+    setStatus("🔗 Трек открыт! Поставь лайк и вернись");
 }
 
-// КНОПКА "ВЫПОЛНИЛ"
+// Кнопка "ВЫПОЛНИЛ"
 function onDone() {
     if (!waitingForDone || !currentNick) {
         setStatus("Сначала нажми СЛУЧАЙНЫЙ НИК", true);
@@ -302,6 +370,7 @@ function onDone() {
     document.getElementById('nickDisplay').innerText = "—";
     setStatus(`Готов! ${currentNick} отмечен. Бери следующий ник`);
     currentNick = null;
+    showToast(`✅ ${currentNick} использован`, false);
 }
 
 // СБРОС
@@ -319,7 +388,7 @@ function resetSession() {
     document.getElementById('trackUrl').value = "";
     document.getElementById('passwordInput').value = "";
     
-    setStatus("Сессия сброшена. Введи ссылку и пароль заново");
+    setStatus("Сессия сброшена. Введи ссылку и пароль");
 }
 
 // СТАРТ
@@ -343,7 +412,7 @@ function startSession() {
     document.getElementById('setupPanel').style.display = "none";
     document.getElementById('mainPanel').style.display = "block";
     
-    document.getElementById('passwordDisplay').innerText = "•".repeat(password.length);
+    document.getElementById('passwordDisplay').innerText = "•".repeat(Math.min(password.length, 12));
     
     available = [...ALL_NICKS];
     used = [];
@@ -354,13 +423,13 @@ function startSession() {
     setStatus("Сессия начата! Жми СЛУЧАЙНЫЙ НИК");
 }
 
-// Обработчики
+// Обработчики (для мобилок - touch)
 document.getElementById('startBtn').onclick = startSession;
 document.getElementById('randomBtn').onclick = onRandomNick;
 document.getElementById('trackBtn').onclick = onOpenTrack;
 document.getElementById('doneBtn').onclick = onDone;
 document.getElementById('resetBtn').onclick = resetSession;
-document.getElementById('nickDisplay').onclick = selectNick;
+document.getElementById('passwordDisplay').onclick = onPasswordClick;
 </script>
 </body>
 </html>
