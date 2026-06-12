@@ -11,8 +11,8 @@
             -webkit-tap-highlight-color: transparent;
         }
         body {
-            background: #0a0a0a;
-            font-family: system-ui, -apple-system, Arial, sans-serif;
+            background: #000000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, Arial, sans-serif;
             padding: 12px;
             margin: 0;
             min-height: 100vh;
@@ -22,135 +22,160 @@
             margin: 0 auto;
         }
         .track-area {
-            background: #1a1a1a;
+            background: #111111;
             padding: 20px;
-            border-radius: 20px;
             margin-bottom: 20px;
         }
         input, button {
-            font-size: 18px;
+            font-size: 16px;
             padding: 14px 18px;
         }
         #trackUrl {
             width: 100%;
-            background: #2a2a2a;
-            color: white;
-            border: 1px solid #444;
-            border-radius: 14px;
+            background: #1a1a1a;
+            color: #ffffff;
+            border: 1px solid #333333;
             margin-bottom: 12px;
-            font-size: 16px;
+            font-size: 14px;
         }
         #passwordInput {
             width: 100%;
-            background: #2a2a2a;
-            color: white;
-            border: 1px solid #444;
-            border-radius: 14px;
+            background: #1a1a1a;
+            color: #ffffff;
+            border: 1px solid #333333;
             margin-bottom: 12px;
-            font-size: 16px;
+            font-size: 14px;
         }
         #startBtn {
             width: 100%;
-            background: #ff5500;
-            color: white;
+            background: #333333;
+            color: #ffffff;
             border: none;
-            border-radius: 14px;
             cursor: pointer;
-            font-weight: bold;
-            font-size: 20px;
-            padding: 16px;
+            font-weight: 600;
+            font-size: 16px;
+            padding: 14px;
+            transition: 0.2s;
+        }
+        #startBtn:hover {
+            background: #444444;
         }
         .main-panel {
-            background: #0f0f0f;
-            border-radius: 24px;
-            padding: 20px;
+            background: #000000;
         }
         .top-buttons {
             display: flex;
             justify-content: flex-end;
+            gap: 10px;
             margin-bottom: 15px;
         }
         .small-btn {
+            background: #1a1a1a;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #cccccc;
+            border: 1px solid #333333;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .small-btn:hover {
             background: #2a2a2a;
-            padding: 10px 18px;
-            font-size: 14px;
-            border-radius: 30px;
-            border: 1px solid #444;
-            font-weight: bold;
+            color: #ffffff;
         }
         .big-btn {
             width: 100%;
-            padding: 28px 16px;
-            font-size: 26px;
+            padding: 24px 16px;
+            font-size: 22px;
             background: #ff5500;
-            border-radius: 60px;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
             margin-bottom: 20px;
-            font-weight: bold;
+            transition: 0.2s;
+        }
+        .big-btn:hover {
+            background: #ff7700;
         }
         .info-bar {
-            background: #1a1a1a;
-            padding: 14px;
-            border-radius: 16px;
+            background: #111111;
+            padding: 12px;
             margin: 15px 0;
             display: flex;
             justify-content: space-between;
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
         }
         .nick-box, .pass-box {
-            background: #222;
+            background: #0a0a0a;
             padding: 18px 12px;
             text-align: center;
-            font-size: 24px;
-            font-family: monospace;
-            border-radius: 16px;
+            font-size: 22px;
+            font-family: 'SF Mono', 'Menlo', monospace;
             margin: 12px 0;
-            font-weight: bold;
-            letter-spacing: 1px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
             cursor: pointer;
             transition: 0.1s;
             word-break: break-all;
+            border: 1px solid #2a2a2a;
         }
         .nick-box {
-            color: #ffaa44;
-            background: #2a1a0a;
-            border: 1px solid #ffaa44;
+            color: #ffffff;
+            background: #0d0d0d;
         }
         .pass-box {
-            color: #88aaff;
-            background: #0a1a2a;
-            border: 1px solid #88aaff;
-            font-size: 22px;
+            color: #aaaaaa;
+            background: #0a0a0a;
+            font-size: 20px;
         }
         .nick-box:active, .pass-box:active {
-            transform: scale(0.98);
-            background: #333;
+            background: #1a1a1a;
         }
         .track-btn {
             width: 100%;
-            padding: 16px;
-            font-size: 20px;
-            background: #9b59b6;
-            color: white;
-            border: none;
-            border-radius: 16px;
+            padding: 14px;
+            font-size: 16px;
+            background: #222222;
+            color: #ffffff;
+            border: 1px solid #333333;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 500;
             margin: 12px 0;
+            transition: 0.2s;
+        }
+        .track-btn:hover {
+            background: #2a2a2a;
+            border-color: #555555;
         }
         .used-btn, .reset-btn {
-            padding: 14px 20px;
-            font-size: 18px;
+            padding: 12px 20px;
+            font-size: 15px;
             margin: 5px;
-            border-radius: 40px;
             flex: 1;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
         }
         .used-btn {
-            background: #cc0000;
+            background: #1a1a1a;
+            color: #ff5555;
+            border: 1px solid #ff5555;
+        }
+        .used-btn:hover {
+            background: #2a1a1a;
         }
         .reset-btn {
-            background: #333;
+            background: #1a1a1a;
+            color: #cccccc;
+            border: 1px solid #333333;
+        }
+        .reset-btn:hover {
+            background: #2a2a2a;
+            color: #ffffff;
         }
         .flex-buttons {
             display: flex;
@@ -164,51 +189,49 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.95);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 2000;
         }
         .recovery-box {
-            background: #121212;
+            background: #111111;
             padding: 24px;
-            border-radius: 28px;
             width: 90%;
             max-width: 340px;
             text-align: center;
-            border: 1px solid #333;
+            border: 1px solid #2a2a2a;
         }
         .recovery-box h3 {
-            color: white;
+            color: #ffffff;
             margin: 0 0 10px 0;
+            font-weight: 500;
         }
         .generated-code {
-            background: #1a1a2a;
+            background: #0a0a0a;
             padding: 14px;
-            border-radius: 16px;
             margin: 15px 0;
             font-family: monospace;
-            font-size: 24px;
-            letter-spacing: 4px;
-            color: #88aaff;
-            font-weight: bold;
+            font-size: 22px;
+            letter-spacing: 3px;
+            color: #ffaa44;
+            font-weight: 500;
             cursor: pointer;
-            border: 1px solid #88aaff;
+            border: 1px solid #2a2a2a;
         }
         .generated-code:active {
-            background: #2a2a3a;
+            background: #1a1a1a;
         }
         .recovery-input {
             width: 100%;
-            background: #2a2a2a;
-            color: white;
-            border: 1px solid #444;
-            border-radius: 16px;
+            background: #1a1a1a;
+            color: #ffffff;
+            border: 1px solid #333333;
             padding: 14px;
-            font-size: 20px;
+            font-size: 18px;
             text-align: center;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             font-family: monospace;
             margin: 10px 0;
         }
@@ -220,19 +243,50 @@
         .recovery-buttons button {
             flex: 1;
             padding: 12px;
-            border-radius: 40px;
-            font-weight: bold;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
         }
         .confirm-btn {
-            background: #ff5500;
+            background: #333333;
+            color: #ffffff;
+        }
+        .confirm-btn:hover {
+            background: #444444;
         }
         .cancel-btn {
+            background: #1a1a1a;
+            color: #aaaaaa;
+            border: 1px solid #2a2a2a;
+        }
+        .cancel-btn:hover {
             background: #2a2a2a;
+            color: #ffffff;
         }
         .code-label {
-            color: #888;
-            font-size: 12px;
+            color: #888888;
+            font-size: 11px;
             margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        input {
+            border-radius: 0;
+        }
+        button {
+            border-radius: 0;
+        }
+        .nick-box, .pass-box {
+            border-radius: 0;
+        }
+        .info-bar {
+            border-radius: 0;
+        }
+        .track-area {
+            border-radius: 0;
+        }
+        .main-panel {
+            border-radius: 0;
         }
     </style>
 </head>
@@ -247,7 +301,7 @@
     <div id="mainPanel" style="display: none;">
         <div class="main-panel">
             <div class="top-buttons">
-                <button id="recoveryBtn" class="small-btn">♻️ Recovery</button>
+                <button id="recoveryBtn" class="small-btn">♻️ RECOVERY</button>
             </div>
             
             <button id="randomBtn" class="big-btn">СЛУЧАЙНЫЙ НИК</button>
@@ -258,8 +312,8 @@
             <button id="trackBtn" class="track-btn">🔗 НА ТРЕК</button>
             
             <div class="info-bar">
-                <span>📦 Осталось: <strong id="remainCount">0</strong></span>
-                <span>✅ Использовано: <strong id="usedCount">0</strong></span>
+                <span>📦 ОСТАЛОСЬ: <strong id="remainCount">0</strong></span>
+                <span>✅ ИСПОЛЬЗОВАНО: <strong id="usedCount">0</strong></span>
             </div>
             
             <div class="flex-buttons">
@@ -287,7 +341,6 @@ const BASE_NICKS = [
     "dudeneatsssssss","whot891","mdmoodl"
 ];
 
-// Новые ники (добавляем только те, которых ещё нет)
 const NEW_NICKS = [
     "noahsmithhhhhh", "ilykilsss", "user-45490173", "drankkk-drank",
     "qlondys", "fuksjail", "mattcrytt", "famlimon", "bleed1ng",
@@ -300,10 +353,8 @@ const NEW_NICKS = [
     "2026-953630611", "user-234347427"
 ];
 
-// Объединяем без дубликатов
 const allUniqueNicks = [...new Set([...BASE_NICKS, ...NEW_NICKS])];
 
-// Создаём массив с трёхзначными номерами (001, 002, 003...)
 const NICKS_WITH_NUMBERS = allUniqueNicks.map((nick, index) => ({
     num: String(index + 1).padStart(3, '0'),
     nick: nick
@@ -342,7 +393,7 @@ function openInBrowser(url) {
             <!DOCTYPE html>
             <html>
             <head><meta http-equiv="refresh" content="0; url=${url}"></head>
-            <body style="background:#0a0a0a;color:white;text-align:center;padding:50px">⏳</body>
+            <body style="background:#000000;color:white;text-align:center;padding:50px">⏳</body>
             </html>
         `);
         newWindow.document.close();
@@ -357,7 +408,6 @@ function openInBrowser(url) {
     }
 }
 
-// ========== RECOVERY ==========
 function showRecoveryModal() {
     const usedNumbers = usedNicks.map(n => n.num).sort();
     let recoveryCode = "";
@@ -370,14 +420,14 @@ function showRecoveryModal() {
     modal.className = 'recovery-modal';
     modal.innerHTML = `
         <div class="recovery-box">
-            <h3>♻️ Recovery</h3>
-            <div class="code-label">📋 Твой код (нажми → копировать)</div>
+            <h3>♻️ RECOVERY</h3>
+            <div class="code-label">📋 ТВОЙ КОД (НАЖМИ → КОПИРОВАТЬ)</div>
             <div class="generated-code" id="generatedCode">${recoveryCode}</div>
-            <div class="code-label">🔓 Или введи чужой код</div>
+            <div class="code-label">🔓 ИЛИ ВВЕДИ ЧУЖОЙ КОД</div>
             <input type="text" id="recoveryInput" class="recovery-input" placeholder="001002003005" autocomplete="off">
             <div class="recovery-buttons">
-                <button id="recoveryConfirm" class="confirm-btn">Восстановить</button>
-                <button id="recoveryCancel" class="cancel-btn">Отмена</button>
+                <button id="recoveryConfirm" class="confirm-btn">ВОССТАНОВИТЬ</button>
+                <button id="recoveryCancel" class="cancel-btn">ОТМЕНА</button>
             </div>
         </div>
     `;
@@ -427,7 +477,6 @@ function processRecoveryCode(code) {
     }
 }
 
-// ========== ОСНОВНЫЕ ФУНКЦИИ ==========
 async function onRandomNick() {
     if (!sessionActive) return;
     if (availableNicks.length === 0) return;
@@ -506,7 +555,6 @@ function startSession() {
     updateUI();
 }
 
-// Обработчики
 document.getElementById('startBtn').onclick = startSession;
 document.getElementById('randomBtn').onclick = onRandomNick;
 document.getElementById('trackBtn').onclick = onOpenTrack;
